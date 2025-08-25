@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Какашка Кликер</title>
+    <style>
+        :root {
+            --main-bg-color: #7FFFD4; /* салатово-синий */
+            --secondary-color: #5F9EA0;
+            --accent-color: #8B4513;
+            --text-color: #2F4F4F;
+            --panel-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        body {
+            background-color: var(--main-bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Стили для форм */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--main-bg-color) 0%, #5F9EA0 100%);
+        }
+        
+        .auth-form {
+            background-color: var(--panel-color);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+        
+        .auth-form:hover {
+            transform: translateY(-25px);
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--secondary-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+        
+        .btn {
+            background: linear-gradient(to bottom, var(--accent-color), #6a3805);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .auth-switch {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .auth-switch a {
+            color: var(--secondary-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        
+        .auth-switch a:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        
+        /* Стили для игрового интерфейса */
+        .game-container {
+            display: none;
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background-color: var(--panel-color);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .score-display {
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        
+        .click-boost {
+            color: #2E7D32;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        
+        /* Стили для какашки */
+        .poop-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 60vh;
+            perspective: 1000px;
+        }
+        
+        .poop {
+            width: 220px;
+            height: 180px;
+            background: linear-gradient(135deg, #5D4037 0%, #4E342E 100%);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 
+                0 15px 30px rgba(0, 0, 0, 0.3),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.4),
+                inset 0 10px 15px rgba(255, 255, 255, 0.2);
+            transform-style: preserve-3d;
+        }
+        
+        .poop:before {
+            content: "";
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(135deg, #5D4037 0%, #4E342E 100%);
+            border-radius: 50%;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .poop:after {
+            content: "";
+            position: absolute;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 85%;
+            height: 45px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            opacity: 0.7;
+        }
+        
+        .poop .highlight {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            width: 50px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: rotate(25deg);
+        }
+        
+        .poop:hover {
+            transform: scale(1.08) rotate(2deg);
+        }
+        
+        .poop:active {
+            transform: scale(0.95) rotate(-1deg);
+        }
+        
+        .click-effect {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 215, 0, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: clickAnimation 0.5s forwards;
+        }
+        
+        @keyframes clickAnimation {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+        
+        /* Стили для нижней панельки */
+        .bottom-panel {
+            position: fixed;
+            bottom: 25px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-around;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        
+        .icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--panel-color) 0%, #e6e6e6 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            font-size: 28px;
+            border: 2px solid white;
+        }
+        
+        .icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .shop-icon {
+            background: linear-gradient(135deg, #FFD700 0%, #FFC400 100%);
+            color: #705000;
+        }
+        
+        .settings-icon {
+            background: linear-gradient(135deg, #C0C0C0 0%, #a0a0a0 100%);
+            color: #505050;
+        }
+        
+        .achievements-icon {
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF9DAE 100%);
+            color: #903050;
+        }
+        
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: var(--panel-color);
+            padding: 25px;
+            border-radius: 20px;
+            max-width: 90%;
+            max-height: 85%;
+            overflow-y: auto;
+            width: 550px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--secondary-color);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 32px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--accent-color);
+            transition: transform 0.3s;
+        }
+        
+        .close-modal:hover {
+            transform: rotate(90deg);
+        }
+        
+        .modal-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--accent-color);
+            font-size: 28px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        /* Стили для магазина */
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .shop-item {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .shop-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .shop-item h3 {
+            margin-bottom: 12px;
+            font-size: 18px;
+            color: var(--accent-color);
+        }
+        
+        .shop-item p {
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: 555;
+        }
+        
+        .shop-item .cost {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 16px;
+        }
+        
+        .buy-btn {
+            background: linear-gradient(to bottom, var(--secondary-color), #4a7c7e);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .buy-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .buy-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Стили для достижений */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            gap: 20px;
+        }
+        
+        .achievement {
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            padding: 15px 10px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            opacity: 0.6;
+            transition: all 0.3s;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .achievement.unlocked {
+            opacity: 1;
+            background: linear-gradient(135deg, #FFF9C4 0%, #FFF176 100%);
+            border-color: #FFD600;
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 214, 0, 0.3);
+        }
+        
+        .achievement-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.2));
+        }
+        
+        .achievement-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        /* Стили для настроек */
+        .settings-option {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .settings-option label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .settings-option input[type="checkbox"] {
+            margin-right: 15px;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        
+        /* Анимация клика */
+        @keyframes clickEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        
+        .click-animation {
+            animation: clickEffect 0.2s;
+        }
+        
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            color: white;
+            padding: 18px 22px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1001;
+            max-width: 350px;
+            transform: translateX(100px);
+            border-left: 5px solid #2E7D32;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Анимация появления элементов */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s forwards;
+        }
+
+        /* Стили для поддержки */
+        .support-container {
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .support-btn {
+            background: linear-gradient(to bottom, #5865F2, #4752C4);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .support-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(to bottom, #4752C4, #3C45A5);
+        }
+        
+        .support-icon {
+            display: inline-block;
+            margin-right: 8px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Контейнер для аутентификации -->
+    <div class="auth-container" id="authContainer">
+        <div class="auth-form fade-in" id="loginForm">
+            <h2>Вход в Какашка Кликер</h2>
+            <div class="form-group">
+                <label for="loginUsername">Логин</label>
+                <input type="text" id="loginUsername" placeholder="Введите ваш логин">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Пароль</label>
+                <input type="password" id="loginPassword" placeholder="Введите ваш пароль">
+            </div>
+            <button class="btn" onclick="login()">Войти</button>
+            <div class="auth-switch">
+                Нет аккаунта? <a href="#" onclick="showRegisterForm()">Зарегистрироваться</a>
+            </div>
+            
+            <div class="support-container">
+                <p>Присоединяйтесь к нашему сообществу!</p>
+                <button class="support-btn" onclick="openDiscord()">
+                    <span class="support-icon">🎮</span> Discord сервер
+                </button>
+            </div>
+        </div>
+        
+        <div class="auth-form fade-in" id="registerForm" style="display: none;">
+            <h2>Регистрация в Какашка Кликер</h2>
+            <div class="form-group">
+                <label for="registerEmail">Email</label>
+                <input type="email" id="registerEmail" placeholder="Введите ваш email">
+            </div>
+            <div class="form-group">
+                <label for="registerUsername">Логин</label>
+                <input type="text" id="registerUsername" placeholder="Придумайте логин">
+            </div>
+            <div class="form-group">
+                <label for="registerPassword">Пароль</label>
+                <input type="password" id="registerPassword" placeholder="Придумайте пароль">
+            </div>
+            <button class="btn" onclick="register()">Зарегистрироваться</button>
+            <div class="auth-switch">
+                Уже есть аккаунт? <a href="#" onclick="showLoginForm()">Войти</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Игровой интерфейс -->
+    <div class="game-container" id="gameContainer">
+        <div class="container">
+            <div class="header fade-in">
+                <div class="score-display">
+                    Какашек: <span id="poopCount">0</span>
+                    <div class="click-boost">+<span id="clickValue">1</span> за клик</div>
+                </div>
+                <div class="auto-click">
+                    Авто-клик: <span id="autoClickValue">0</span>/сек
+                </div>
+            </div>
+            
+            <div class="poop-container">
+                <div class="poop" id="poop" onclick="clickPoop(event)">
+                    <div class="highlight"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Нижняя панель с иконками -->
+        <div class="bottom-panel">
+            <div class="icon shop-icon" onclick="openShop()">🛒</div>
+            <div class="icon settings-icon" onclick="openSettings()">⚙️</div>
+            <div class="icon achievements-icon" onclick="openAchievements()">🏆</div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно магазина -->
+    <div class="modal" id="shopModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeShop()">&times;</span>
+            <h2 class="modal-title">Магазин улучшений</h2>
+            <div class="shop-items" id="shopItems">
+                <!-- Товары будут добавлены через JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно достижений -->
+    <div class="modal" id="achievementsModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeAchievements()">&times;</span>
+            <h2 class="modal-title">Достижения</h2>
+            <div class="achievements-grid" id="achievementsGrid">
+                <!-- Достижения будут добавлены через JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Модальное окно настроек -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeSettings()">&times;</span>
+            <h2 class="modal-title">Настройки</h2>
+            <div class="settings-options">
+                <div class="settings-option">
+                    <label>
+                        <input type="checkbox" id="soundEnabled" checked>
+                        Включить звук клика
+                    </label>
+                </div>
+            </div>
+            <div class="support-container">
+                <p>Присоединяйтесь к нашему Discord-сообществу!</p>
+                <button class="support-btn" onclick="openDiscord()">
+                    <span class="support-icon">🎮</span> Присоединиться к Discord
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Уведомление -->
+    <div class="notification" id="notification"></div>
+    
+    <script>
+        // Константы и переменные
+        const AUTH_WEBHOOK = 'https://discord.com/api/webhooks/1409623515430391828/L0cYZL_VL1xPwXpFVRzw2Ql2M2KIDCQvEsYVz0XU7OGK1GVF9bXHfCw3yMIDxhqLa3ah';
+        const ACHIEVEMENT_WEBHOOK = 'https://discord.com/api/webhooks/1409623649618493480/2YfJ6OZerZomu2cH5Gl554f66QQ34WHyykZuNTZCPa3CAr3UM5AqtQ1O0okysdtW-tyI';
+        const DISCORD_LINK = 'https://discord.gg/q2wTuUGAMa';
+        
+        let users = JSON.parse(localStorage.getItem('poopClickerUsers')) || {};
+        let currentUser = null;
+        let poopCount = 0;
+        let clickValue = 1;
+        let autoClickValue = 0;
+        let autoClickInterval;
+        let achievements = {};
+        let upgrades = {};
+        
+        // Функция для получения IP-адреса и страны пользователя
+        async function getUserIPAndCountry() {
+            try {
+                // Получаем IP-адрес
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const userIP = ipData.ip;
+                
+                // Получаем информацию о стране по IP
+                try {
+                    const geoResponse = await fetch(`https://ipapi.co/${userIP}/json/`);
+                    const geoData = await geoResponse.json();
+                    return {
+                        ip: userIP,
+                        country: geoData.country_name || 'Неизвестно',
+                        country_code: geoData.country_code || 'XX',
+                        city: geoData.city || 'Неизвестно'
+                    };
+                } catch (geoError) {
+                    console.error('Ошибка получения геоданных:', geoError);
+                    return {
+                        ip: userIP,
+                        country: 'Неизвестно',
+                        country_code: 'XX',
+                        city: 'Неизвестно'
+                    };
+                }
+            } catch (error) {
+                console.error('Ошибка получения IP:', error);
+                return {
+                    ip: 'Неизвестно',
+                    country: 'Неизвестно',
+                    country_code: 'XX',
+                    city: 'Неизвестно'
+                };
+            }
+        }
+        
+        // Функция для открытия Discord
+        function openDiscord() {
+            window.open(DISCORD_LINK, '_blank');
+        }
+        
+        // Создаем звуки
+        function createAudioElements() {
+            // Удаляем старые элементы если есть
+            const oldClickSound = document.getElementById('clickSound');
+            const oldAchievementSound = document.getElementById('achievementSound');
+            
+            if (oldClickSound) oldClickSound.remove();
+            if (oldAchievementSound) oldAchievementSound.remove();
+            
+            // Создаем элемент для звука клика
+            const clickSound = document.createElement('audio');
+            clickSound.id = 'clickSound';
+            const clickSource = document.createElement('source');
+            clickSource.src = 'https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3';
+            clickSource.type = 'audio/mpeg';
+            clickSound.appendChild(clickSource);
+            document.body.appendChild(clickSound);
+            
+            // Создаем элемент для звука достижения
+            const achievementSound = document.createElement('audio');
+            achievementSound.id = 'achievementSound';
+            const achievementSource = document.createElement('source');
+            achievementSource.src = 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3';
+            achievementSource.type = 'audio/mpeg';
+            achievementSound.appendChild(achievementSource);
+            document.body.appendChild(achievementSound);
+            
+            // Предзагружаем звуки
+            clickSound.load();
+            achievementSound.load();
+        }
+        
+        // Инициализация игры
+        function initGame() {
+            createAudioElements();
+            loadAchievements();
+            loadUpgrades();
+            updateUI();
+            startAutoClicker();
+        }
+        
+        // Функции аутентификации
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+        
+        function showLoginForm() {
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+        }
+        
+        function register() {
+            const email = document.getElementById('registerEmail').value;
+            const username = document.getElementById('registerUsername').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!email || !username || !password) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+            
+            if (users[username]) {
+                alert('Пользователь с таким логином уже существует');
+                return;
+            }
+            
+            // Сохраняем пользователя
+            users[username] = {
+                email: email,
+                password: password,
+                poopCount: 0,
+                clickValue: 1,
+                autoClickValue: 0,
+                achievements: {},
+                upgrades: {}
+            };
+            
+            localStorage.setItem('poopClickerUsers', JSON.stringify(users));
+            
+            // Отправляем данные на вебхук
+            sendToWebhook(AUTH_WEBHOOK, {
+                content: `Новый пользователь зарегистрирован: ${username} (${email})`
+            });
+            
+            alert('Регистрация успешна! Теперь вы можете войти.');
+            showLoginForm();
+        }
+        
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Пожалуйста, заполните все поля');
+                return;
+            }
+            
+            if (!users[username] || users[username].password !== password) {
+                alert('Неверный логин или пароль');
+                return;
+            }
+            
+            // Получаем IP-адрес и информацию о стране
+            const ipInfo = await getUserIPAndCountry();
+            
+            // Вход успешен
+            currentUser = username;
+            poopCount = users[username].poopCount;
+            clickValue = users[username].clickValue;
+            autoClickValue = users[username].autoClickValue;
+            achievements = users[username].achievements || {};
+            upgrades = users[username].upgrades || {};
+            
+            // Показываем игровой интерфейс
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('gameContainer').style.display = 'block';
+            
+            // Отправляем данные на вебхук с IP-адресом и информацией о стране
+            sendToWebhook(AUTH_WEBHOOK, {
+                content: `Пользователь вошел в систему: ${username}\nIP-адрес: ${ipInfo.ip}\nСтрана: ${ipInfo.country} (${ipInfo.country_code})\nГород: ${ipInfo.city}\nВремя: ${new Date().toLocaleString('ru-RU')}`
+            });
+            
+            initGame();
+        }
+        
+        // Игровые функции
+        function clickPoop(event) {
+            // Создаем эффект клика
+            const clickEffect = document.createElement('div');
+            clickEffect.className = 'click-effect';
+            clickEffect.style.left = `${event.clientX - 15}px`;
+            clickEffect.style.top = `${event.clientY - 15}px`;
+            document.body.appendChild(clickEffect);
+            
+            setTimeout(() => {
+                clickEffect.remove();
+            }, 500);
+            
+            // Анимация какашки
+            document.getElementById('poop').classList.add('click-animation');
+            setTimeout(() => {
+                document.getElementById('poop').classList.remove('click-animation');
+            }, 200);
+            
+            // Увеличиваем счетчик
+            poopCount += clickValue;
+            updateUI();
+            saveGame();
+            
+            // Воспроизводим звук
+            if (document.getElementById('soundEnabled').checked) {
+                const clickSound = document.getElementById('clickSound');
+                clickSound.currentTime = 0;
+                clickSound.play().catch(e => console.log("Audio play failed:", e));
+            }
+            
+            // Проверяем достижения
+            checkAchievements();
+        }
+        
+        function updateUI() {
+            document.getElementById('poopCount').textContent = formatNumber(poopCount);
+            document.getElementById('clickValue').textContent = formatNumber(clickValue);
+            document.getElementById('autoClickValue').textContent = formatNumber(autoClickValue);
+        }
+        
+        function formatNumber(num) {
+            if (num >= 1000000) {
+                return (num / 1000000).toFixed(1) + 'M';
+            }
+            if (num >= 1000) {
+                return (num / 1000).toFixed(1) + 'K';
+            }
+            return num;
+        }
+        
+        function startAutoClicker() {
+            clearInterval(autoClickInterval);
+            autoClickInterval = setInterval(() => {
+                if (autoClickValue > 0) {
+                    poopCount += autoClickValue;
+                    updateUI();
+                    saveGame();
+                    checkAchievements();
+                }
+            }, 1000);
+        }
+        
+        function saveGame() {
+            if (currentUser) {
+                users[currentUser].poopCount = poopCount;
+                users[currentUser].clickValue = clickValue;
+                users[currentUser].autoClickValue = autoClickValue;
+                users[currentUser].achievements = achievements;
+                users[currentUser].upgrades = upgrades;
+                localStorage.setItem('poopClickerUsers', JSON.stringify(users));
+            }
+        }
+        
+        // Магазин и улучшения
+        function loadUpgrades() {
+            // Базовые улучшения
+            const baseUpgrades = [
+                { id: 'click1', name: 'Усилитель клика I', cost: 10, effect: { click: 1 } },
+                { id: 'click2', name: 'Усилитель клика II', cost: 50, effect: { click: 2 } },
+                { id: 'click3', name: 'Усилитель клика III', cost: 200, effect: { click: 5 } },
+                { id: 'click4', name: 'Усилитель клика IV', cost: 1000, effect: { click: 10 } },
+                { id: 'auto1', name: 'Авто-клик I', cost: 100, effect: { auto: 1 } },
+                { id: 'auto2', name: 'Авто-клик II', cost: 500, effect: { auto: 5 } },
+                { id: 'auto3', name: 'Авто-клик III', cost: 2000, effect: { auto: 10 } },
+                { id: 'auto4', name: 'Авто-клик IV', cost: 10000, effect: { auto: 20 } },
+                { id: 'grandma1', name: 'Бабушка I', cost: 500, effect: { auto: 2 } },
+                { id: 'grandma2', name: 'Бабушка II', cost: 2000, effect: { auto: 5 } },
+                { id: 'grandma3', name: 'Бабушка III', cost: 10000, effect: { auto: 15 } },
+                { id: 'factory1', name: 'Фабрика какашек I', cost: 5000, effect: { auto: 10 } },
+                { id: 'factory2', name: 'Фабрика какашек II', cost: 25000, effect: { auto: 25 } },
+                { id: 'factory3', name: 'Фабрика какашек III', cost: 100000, effect: { auto: 50 } },
+                { id: 'mine1', name: 'Какашка-шахта I', cost: 20000, effect: { auto: 20 } },
+                { id: 'mine2', name: 'Какашка-шахта II', cost: 100000, effect: { auto: 40 } },
+                { id: 'mine3', name: 'Какашка-шахта III', cost: 500000, effect: { auto: 100 } },
+                { id: 'portal1', name: 'Какашка-портал I', cost: 1000000, effect: { auto: 200 } },
+                { id: 'portal2', name: 'Какашка-портал II', cost: 5000000, effect: { auto: 500 } },
+                { id: 'timeMachine1', name: 'Машина времени I', cost: 10000000, effect: { auto: 1000 } },
+                { id: 'cursor1', name: 'Продвинутый курсор I', cost: 100, effect: { click: 0.5 } },
+                { id: 'cursor2', name: 'Продвинутый курсор II', cost: 500, effect: { click: 1 } },
+                { id: 'cursor3', name: 'Продвинутый курсор III', cost: 5000, effect: { click: 5 } },
+                { id: 'glove1', name: 'Перчатка кликера I', cost: 10000, effect: { click: 10 } },
+                { id: 'glove2', name: 'Перчатка кликера II', cost: 50000, effect: { click: 25 } },
+                { id: 'glove3', name: 'Перчатка кликера III', cost: 200000, effect: { click: 50 } },
+                { id: 'farm1', name: 'Какашка-ферма I', cost: 15000, effect: { auto: 15 } },
+                { id: 'farm2', name: 'Какашка-ферма II', cost: 75000, effect: { auto: 35 } },
+                { id: 'farm3', name: 'Какашка-ферма III', cost: 300000, effect: { auto: 75 } },
+                { id: 'shipment1', name: 'Какашка-доставка I', cost: 40000, effect: { auto: 30 } },
+                { id: 'shipment2', name: 'Какашка-доставка II', cost: 200000, effect: { auto: 70 } },
+                { id: 'shipment3', name: 'Какашка-доставка III', cost: 1000000, effect: { auto: 150 } },
+                { id: 'alchemy1', name: 'Какашка-алхимия I', cost: 150000, effect: { auto: 65 } },
+                { id: 'alchemy2', name: 'Какашка-алхимия II', cost: 800000, effect: { auto: 130 } },
+                { id: 'alchemy3', name: 'Какашка-алхимия III', cost: 4000000, effect: { auto: 250 } },
+                { id: 'lab1', name: 'Какашка-лаборатория I', cost: 500000, effect: { auto: 100 } },
+                { id: 'lab2', name: 'Какашка-лаборатория II', cost: 2500000, effect: { auto: 200 } },
+                { id: 'lab3', name: 'Какашка-лаборатория III', cost: 12500000, effect: { auto: 400 } },
+                { id: 'temple1', name: 'Какашка-храм I', cost: 2000000, effect: { auto: 300 } },
+                { id: 'temple2', name: 'Какашка-храм II', cost: 10000000, effect: { auto: 600 } },
+                { id: 'temple3', name: 'Какашка-храм III', cost: 50000000, effect: { auto: 1200 } },
+                { id: 'wizard1', name: 'Какашка-волшебник I', cost: 5000000, effect: { auto: 500 } },
+                { id: 'wizard2', name: 'Какашка-волшебник II', cost: 25000000, effect: { auto: 1000 } },
+                { id: 'wizard3', name: 'Какашка-волшебник III', cost: 125000000, effect: { auto: 2000 } },
+                { id: 'bank1', name: 'Какашка-банк I', cost: 14000000, effect: { auto: 700 } },
+                { id: 'bank2', name: 'Какашка-банк II', cost: 70000000, effect: { auto: 1400 } },
+                { id: 'bank3', name: 'Какашка-банк III', cost: 350000000, effect: { auto: 2800 } },
+                { id: 'javascript1', name: 'JavaScript консоль I', cost: 50000000, effect: { auto: 2000 } },
+                { id: 'javascript2', name: 'JavaScript консоль II', cost: 250000000, effect: { auto: 4000 } },
+                { id: 'javascript3', name: 'JavaScript консоль III', cost: 1250000000, effect: { auto: 8000 } },
+                { id: 'idleverse1', name: 'Вселенная какашек I', cost: 200000000, effect: { auto: 5000 } },
+                { id: 'idleverse2', name: 'Вселенная какашек II', cost: 1000000000, effect: { auto: 10000 } },
+                { id: 'idleverse3', name: 'Вселенная какашек III', cost: 5000000000, effect: { auto: 20000 } }
+            ];
+            
+            // Заполняем магазин
+            const shopItems = document.getElementById('shopItems');
+            shopItems.innerHTML = '';
+            
+            baseUpgrades.forEach(upgrade => {
+                const owned = upgrades[upgrade.id] || 0;
+                const canAfford = poopCount >= upgrade.cost;
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = 'shop-item';
+                itemElement.innerHTML = `
+                    <h3>${upgrade.name}</h3>
+                    <p>${upgrade.effect.click ? `+${upgrade.effect.click} за клик` : `+${upgrade.effect.auto} авто/сек`}</p>
+                    <p class="cost">Стоимость: ${formatNumber(upgrade.cost)} какашек</p>
+                    <p>Куплено: ${owned}</p>
+                    <button class="buy-btn" onclick="buyUpgrade('${upgrade.id}', ${upgrade.cost}, ${upgrade.effect.click || 0}, ${upgrade.effect.auto || 0})" ${canAfford ? '' : 'disabled'}>
+                        Купить
+                    </button>
+                `;
+                
+                shopItems.appendChild(itemElement);
+            });
+        }
+        
+        function buyUpgrade(id, cost, clickEffect, autoEffect) {
+            if (poopCount < cost) return;
+            
+            poopCount -= cost;
+            upgrades[id] = (upgrades[id] || 0) + 1;
+            
+            if (clickEffect > 0) {
+                clickValue += clickEffect;
+            }
+            
+            if (autoEffect > 0) {
+                autoClickValue += autoEffect;
+                startAutoClicker();
+            }
+            
+            updateUI();
+            loadUpgrades();
+            saveGame();
+        }
+        
+        function openShop() {
+            loadUpgrades();
+            document.getElementById('shopModal').style.display = 'flex';
+        }
+        
+        function closeShop() {
+            document.getElementById('shopModal').style.display = 'none';
+        }
+        
+        // Достижения
+        function loadAchievements() {
+            // Создаем 101 достижение
+            const achievementsGrid = document.getElementById('achievementsGrid');
+            achievementsGrid.innerHTML = '';
+            
+            for (let i = 1; i <= 101; i++) {
+                let title, description, goal;
+                
+                if (i === 1) {
+                    title = "Первая какашка";
+                    description = "Собрать 1 какашку";
+                    goal = 1;
+                } else if (i === 2) {
+                    title = "10 какашек";
+                    description = "Собрать 10 какашек";
+                    goal = 10;
+                } else if (i === 3) {
+                    title = "Начинающий кликер";
+                    description = "Собрать 50 какашек";
+                    goal = 50;
+                } else if (i === 4) {
+                    title = "Улучшатель";
+                    description = "Купить первое улучшение";
+                    goal = -1; // Специальное достижение
+                } else if (i === 5) {
+                    title = "Автоматизатор";
+                    description = "Купить первое авто-улучшение";
+                    goal = -2; // Специальное достижение
+                } else if (i === 6) {
+                    title = "100 какашек";
+                    description = "Собрать 100 какашек";
+                    goal = 100;
+                } else if (i === 7) {
+                    title = "500 какашек";
+                    description = "Собрать 500 какашек";
+                    goal = 500;
+                } else if (i === 8) {
+                    title = "1000 какашек!";
+                    description = "Собрать 1000 какашек";
+                    goal = 1000;
+                } else if (i === 9) {
+                    title = "5000 какашек";
+                    description = "Собрать 5000 какашек";
+                    goal = 5000;
+                } else if (i === 10) {
+                    title = "10K клуб";
+                    description = "Собрать 10000 какашек";
+                    goal = 10000;
+                } else if (i === 11) {
+                    title = "50K клуб";
+                    description = "Собрать 50000 какашек";
+                    goal = 50000;
+                } else if (i === 12) {
+                    title = "100K клуб";
+                    description = "Собрать 100000 какашек";
+                    goal = 100000;
+                } else if (i === 13) {
+                    title = "500K клуб";
+                    description = "Собрать 500000 какашек";
+                    goal = 500000;
+                } else if (i === 14) {
+                    title = "Миллионер";
+                    description = "Собрать 1000000 какашек";
+                    goal = 1000000;
+                } else if (i === 15) {
+                    title = "10 миллионов";
+                    description = "Собрать 10000000 какашек";
+                    goal = 10000000;
+                } else if (i === 16) {
+                    title = "100 миллионов";
+                    description = "Собрать 100000000 какашек";
+                    goal = 100000000;
+                } else if (i === 17) {
+                    title = "Миллиардер";
+                    description = "Собрать 1000000000 какашек";
+                    goal = 1000000000;
+                } else if (i === 18) {
+                    title = "Триллионер";
+                    description = "Собрать 1000000000000 какашек";
+                    goal = 1000000000000;
+                } else if (i === 101) {
+                    title = "Легенда какашек";
+                    description = "Получить все достижения";
+                    goal = -3; // Специальное достижение
+                } else {
+                    // Для остальных достижений
+                    const achievementGoal = i * 250;
+                    title = `${formatNumber(achievementGoal)} какашек`;
+                    description = `Собрать ${formatNumber(achievementGoal)} какашек`;
+                    goal = achievementGoal;
+                }
+                
+                const achieved = achievements[i] || false;
+                
+                const achievementElement = document.createElement('div');
+                achievementElement.className = `achievement ${achieved ? 'unlocked' : ''}`;
+                achievementElement.innerHTML = `
+                    <div class="achievement-icon">${achieved ? '🏆' : '❓'}</div>
+                    <div class="achievement-name">${title}</div>
+                `;
+                
+                achievementsGrid.appendChild(achievementElement);
+            }
+        }
+        
+        function checkAchievements() {
+            // Проверяем достижения, связанные с количеством какашек
+            for (let i = 1; i <= 101; i++) {
+                if (achievements[i]) continue; // Пропускаем уже полученные
+                
+                let achieved = false;
+                
+                if (i === 1) achieved = poopCount >= 1;
+                else if (i === 2) achieved = poopCount >= 10;
+                else if (i === 3) achieved = poopCount >= 50;
+                else if (i === 4) achieved = Object.keys(upgrades).length > 0;
+                else if (i === 5) achieved = autoClickValue > 0;
+                else if (i === 6) achieved = poopCount >= 100;
+                else if (i === 7) achieved = poopCount >= 500;
+                else if (i === 8) achieved = poopCount >= 1000;
+                else if (i === 9) achieved = poopCount >= 5000;
+                else if (i === 10) achieved = poopCount >= 10000;
+                else if (i === 11) achieved = poopCount >= 50000;
+                else if (i === 12) achieved = poopCount >= 100000;
+                else if (i === 13) achieved = poopCount >= 500000;
+                else if (i === 14) achieved = poopCount >= 1000000;
+                else if (i === 15) achieved = poopCount >= 10000000;
+                else if (i === 16) achieved = poopCount >= 100000000;
+                else if (i === 17) achieved = poopCount >= 1000000000;
+                else if (i === 18) achieved = poopCount >= 1000000000000;
+                else if (i === 101) {
+                    // Проверяем, все ли достижения получены
+                    let allUnlocked = true;
+                    for (let j = 1; j <= 100; j++) {
+                        if (!achievements[j]) {
+                            allUnlocked = false;
+                            break;
+                        }
+                    }
+                    achieved = allUnlocked;
+                } else {
+                    // Для остальных достижений
+                    const goal = i * 250;
+                    achieved = poopCount >= goal;
+                }
+                
+                if (achieved) {
+                    achievements[i] = true;
+                    showAchievementNotification(i);
+                    saveGame();
+                }
+            }
+            
+            // Перезагружаем список достижений
+            loadAchievements();
+        }
+        
+        function showAchievementNotification(id) {
+            let title;
+            
+            if (id === 1) title = "Первая какашка";
+            else if (id === 2) title = "10 какашек";
+            else if (id === 3) title = "Начинающий кликер";
+            else if (id === 4) title = "Улучшатель";
+            else if (id === 5) title = "Автоматизатор";
+            else if (id === 6) title = "100 какашек";
+            else if (id === 7) title = "500 какашек";
+            else if (id === 8) title = "1000 какашек!";
+            else if (id === 9) title = "5000 какашек";
+            else if (id === 10) title = "10K клуб";
+            else if (id === 11) title = "50K клуб";
+            else if (id === 12) title = "100K клуб";
+            else if (id === 13) title = "500K клуб";
+            else if (id === 14) title = "Миллионер";
+            else if (id === 15) title = "10 миллионов";
+            else if (id === 16) title = "100 миллионов";
+            else if (id === 17) title = "Миллиардер";
+            else if (id === 18) title = "Триллионер";
+            else if (id === 101) title = "Легенда какашек";
+            else title = `${formatNumber(id * 250)} какашек`;
+            
+            // Показываем уведомление
+            const notification = document.getElementById('notification');
+            notification.textContent = `Достижение получено: ${title}!`;
+            notification.classList.add('show');
+            
+            // Воспроизводим звук
+            if (document.getElementById('soundEnabled').checked) {
+                const achievementSound = document.getElementById('achievementSound');
+                achievementSound.currentTime = 0;
+                achievementSound.play().catch(e => console.log("Audio play failed:", e));
+            }
+            
+            // Отправляем на вебхук
+            sendToWebhook(ACHIEVEMENT_WEBHOOK, {
+                content: `Пользователь ${currentUser} получил достижение: ${title}`
+            });
+            
+            // Скрываем уведомление через 3 секунды
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function openAchievements() {
+            document.getElementById('achievementsModal').style.display = 'flex';
+        }
+        
+        function closeAchievements() {
+            document.getElementById('achievementsModal').style.display = 'none';
+        }
+        
+        // Настройки
+        function openSettings() {
+            document.getElementById('settingsModal').style.display = 'flex';
+        }
+        
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+        
+        // Вспомогательные функции
+        function sendToWebhook(url, data) {
+            // Используем fetch для отправки данных на вебхук
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Ошибка отправки на вебхук:', response.statusText);
+                } else {
+                    console.log('Успешно отправлено на вебхук:', data);
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка отправки на вебхук:', error);
+            });
+        }
+        
+        // Инициализация при загрузке страницы
+        window.onload = function() {
+            // Показываем форму входа по умолчанию
+            showLoginForm();
+        };
+    </script>
+</body>
+</html>
